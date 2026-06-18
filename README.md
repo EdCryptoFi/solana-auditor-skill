@@ -55,11 +55,14 @@ The installer copies the skill to `~/.claude/skills/solana-auditor/` and updates
 ### Slash Commands (run in your Solana project)
 
 ```
+/audit-doctor  — check the audit toolchain is installed (run this first)
 /audit-init    — initialize workspace, survey codebase
 /audit-scan    — run all automated analysis tools
 /audit-onchain — inspect a deployed Program ID (authority, verifiable build, blast radius)
-/audit-report  — generate the final audit report (markdown + SARIF + JSON)
+/audit-report  — generate the final audit report (markdown + SARIF + JSON + HTML)
 ```
+
+Try it on the bundled deliberately-vulnerable program in [`examples/vulnerable-vault`](examples/) to see the whole flow end-to-end.
 
 ### Natural Language
 
@@ -75,9 +78,12 @@ The installer copies the skill to `~/.claude/skills/solana-auditor/` and updates
 ### Agents
 
 ```
-Spawn lead-auditor   → scope, threat model, audit plan (opus)
-Spawn vuln-researcher → deep instruction review + PoC (sonnet)
-Spawn report-writer  → professional report generation (sonnet)
+Spawn lead-auditor      → scope, threat model, audit plan (opus)
+Spawn competition-auditor → speed-optimized contest audits (opus)
+Spawn vuln-researcher   → deep instruction review + PoC (sonnet)
+Spawn economic-auditor  → flash loan / oracle / rounding / liquidation (opus)
+Spawn diff-auditor      → upgrade / differential audits (opus)
+Spawn report-writer     → professional report generation (sonnet)
 ```
 
 ## Skill Files
@@ -100,17 +106,23 @@ solana-auditor-skill/
 │   ├── tools-setup.md              # Tool installation + CI
 │   ├── ai-agent-vulnerabilities.md # Agent wallets, session keys, prompt injection
 │   ├── evm-to-solana-mapping.md    # For auditors coming from Ethereum
+│   ├── report-template.html        # Self-contained interactive HTML report
 │   └── resources.md                # Prior audits, references
 ├── agents/
 │   ├── lead-auditor.md             # Opus: orchestrates audit
 │   ├── competition-auditor.md      # Opus: speed-optimized contest audits
 │   ├── vuln-researcher.md          # Sonnet: deep vuln analysis + PoC
+│   ├── economic-auditor.md         # Opus: flash loan / oracle / rounding
+│   ├── diff-auditor.md             # Opus: upgrade / differential audits
 │   └── report-writer.md            # Sonnet: professional reports
 ├── commands/
+│   ├── audit-doctor.md             # /audit-doctor
 │   ├── audit-init.md               # /audit-init
 │   ├── audit-scan.md               # /audit-scan
 │   ├── audit-onchain.md            # /audit-onchain
 │   └── audit-report.md             # /audit-report
+├── examples/
+│   └── vulnerable-vault/           # Deliberately vulnerable demo + answer key
 └── rules/
     └── audit-discipline.md         # 10 non-negotiable audit rules
 ```

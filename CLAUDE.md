@@ -33,10 +33,11 @@ Or ask naturally:
 
 | Command | When to use |
 |---------|-------------|
+| `/audit-doctor` | Before anything — verify the audit toolchain is installed |
 | `/audit-init` | Start of every audit engagement |
 | `/audit-scan` | Phase 1 — automated analysis |
 | `/audit-onchain` | Deployed program — verify bytecode, authority, blast radius |
-| `/audit-report` | Phase 5 — generate final report (markdown + SARIF + JSON) |
+| `/audit-report` | Phase 5 — generate final report (markdown + SARIF + JSON + HTML) |
 
 ## Specialized Skill Files
 
@@ -51,7 +52,10 @@ Beyond the source-review core, load on demand:
 | Agent | Model | Use for |
 |-------|-------|---------|
 | `lead-auditor` | opus | Scoping, threat model, audit plan, finding triage |
+| `competition-auditor` | opus | Speed-optimized contest audits (Code4rena / Cantina) |
 | `vuln-researcher` | sonnet | Deep per-instruction review, PoC development |
+| `economic-auditor` | opus | DeFi value-extraction: flash loan, oracle, rounding, liquidation |
+| `diff-auditor` | opus | Upgrade / differential audits (review the diff) |
 | `report-writer` | sonnet | Professional report generation |
 
 ## How This Differs from Other Security Skills in the Kit

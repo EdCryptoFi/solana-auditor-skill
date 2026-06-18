@@ -98,6 +98,8 @@ Spawn specialized agents for long-running or parallel audit work:
 | Orchestrate a full audit engagement (firm mode) | [lead-auditor](../agents/lead-auditor.md) | opus |
 | Speed-optimized competitive audit (Code4rena / Cantina) | [competition-auditor](../agents/competition-auditor.md) | opus |
 | Deep-dive vulnerability research on one instruction | [vuln-researcher](../agents/vuln-researcher.md) | sonnet |
+| DeFi economic exploits (flash loan, oracle, rounding, liquidation) | [economic-auditor](../agents/economic-auditor.md) | opus |
+| Upgrade / differential audit (review the diff between versions) | [diff-auditor](../agents/diff-auditor.md) | opus |
 | Generate or refine the audit report | [report-writer](../agents/report-writer.md) | sonnet |
 
 ---
@@ -106,10 +108,11 @@ Spawn specialized agents for long-running or parallel audit work:
 
 | Command | What it does |
 |---------|-------------|
+| `/audit-doctor` | Preflight: check the audit toolchain is installed, show fixes for what's missing |
 | `/audit-init` | Scaffold audit workspace, initialize findings tracker |
 | `/audit-scan` | Run all automated tools and collect raw findings |
 | `/audit-onchain` | Inspect a deployed Program ID: authority, verifiable build, blast radius |
-| `/audit-report` | Generate formatted audit report (markdown + SARIF + JSON) from findings |
+| `/audit-report` | Generate formatted audit report (markdown + SARIF + JSON + HTML) from findings |
 
 ---
 

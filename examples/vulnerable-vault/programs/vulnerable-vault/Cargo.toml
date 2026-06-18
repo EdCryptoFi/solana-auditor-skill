@@ -1,0 +1,24 @@
+[package]
+name = "vulnerable-vault"
+version = "0.1.0"
+description = "DELIBERATELY VULNERABLE demo program for the solana-auditor skill. Do not deploy."
+edition = "2021"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "vulnerable_vault"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+idl-build = ["anchor-lang/idl-build"]
+
+[dependencies]
+anchor-lang = "0.31"
+
+# NOTE: overflow-checks intentionally left UNSET here (VULN-9 demo).
+# A real program should add:
+# [profile.release]
+# overflow-checks = true

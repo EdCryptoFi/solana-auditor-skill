@@ -381,6 +381,37 @@ Always emit a structured findings file alongside the human report. CI pipelines,
 
 ---
 
+## Interactive HTML Report (optional deliverable)
+
+For a client- or PR-friendly view, emit a **single self-contained HTML file** alongside the markdown. It has severity-filter cards, a search box, and collapsible findings with PoCs — no server, no CDN, no network. Many protocol teams prefer this to a PDF.
+
+The template ships with the skill at [report-template.html](report-template.html). It reads from the same `findings.json`, so it never drifts from the markdown report.
+
+```bash
+# Generate the HTML report from findings.json (run from the audited project)
+cp ~/.claude/skills/solana-auditor/skill/report-template.html \
+   audit-workspace/reports/audit-report.html
+
+# Replace the inline `const DATA = {...}` placeholder with the real findings.json.
+# Robust approach — inject the JSON between the two marker comments:
+python3 - <<'PY'
+import json, re, pathlib
+data = pathlib.Path("audit-workspace/reports/findings.json").read_text()
+html = pathlib.Path("audit-workspace/reports/audit-report.html").read_text()
+html = re.sub(r"const DATA = \{[\s\S]*?\n\};",
+              "const DATA = " + data.strip().rstrip(";") + ";",
+              html, count=1)
+pathlib.Path("audit-workspace/reports/audit-report.html").write_text(html)
+print("audit-report.html written")
+PY
+```
+
+**Where it lives**: the *template* stays in the skill repo (`skill/report-template.html`); the *generated report* lands in the audited project at `audit-workspace/reports/audit-report.html`. Never commit client reports into the skill.
+
+The `findings[]` objects support these optional fields for richer rendering: `description`, `impact`, `poc`, `recommendation` (in addition to the core `id`, `title`, `severity`, `cvss`, `cvssVector`, `category`, `location`, `status`, `hasPoc`).
+
+---
+
 ## Quality Gate
 
 Before sending the report:
