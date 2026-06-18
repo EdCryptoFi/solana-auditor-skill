@@ -260,40 +260,63 @@ semgrep --config p/solana --json . > audit-workspace/semgrep.json
 
 ### Custom semgrep Rules for Common Patterns
 
+semgrep is a **lead generator, not an oracle**. It is good at flagging concrete syntactic anti-patterns (`unwrap`, raw casts, raw deserialization) and bad at semantic checks like "is this authority verified", which require dataflow it can't reliably do on Rust. Write rules that surface *candidates to review*, and don't pretend a clean semgrep run means anything (see rules/audit-discipline.md Rule 9).
+
 ```yaml
 # audit-workspace/rules/solana-audit.yaml
 rules:
-  - id: missing-signer-check
-    pattern: |
-      pub fn $FUNC(ctx: Context<$CTX>, ...) -> Result<()> {
-        ...
-        $ACCOUNT.key()
-        ...
-      }
-    message: "Verify $ACCOUNT has a signer check if it represents an authority"
+  # AccountInfo authorities are the #1 place a signer check goes missing.
+  # This flags the candidate; the auditor confirms whether is_signer is enforced.
+  - id: accountinfo-authority-candidate
+    pattern-regex: '(authority|admin|owner|signer)\s*:\s*(AccountInfo|UncheckedAccount)'
+    message: "AccountInfo/UncheckedAccount used for an authority-like account. Confirm an explicit is_signer (and ownership) check exists — Anchor does NOT enforce it for these types."
     languages: [rust]
     severity: WARNING
+    paths: { include: ["programs/**"] }
 
-  - id: unchecked-arithmetic
-    pattern: |
-      $A + $B
-    message: "Prefer checked_add() over + for financial calculations"
+  # Raw deserialization with no owner check (type confusion / missing owner, vuln #2, #6).
+  - id: raw-deserialize-candidate
+    patterns:
+      - pattern-either:
+          - pattern: $T::try_from_slice($DATA)
+          - pattern: $T::deserialize(&mut $DATA)
+      - pattern-not-inside: "#[cfg(test)] ..."
+    message: "Raw Borsh deserialization. Confirm the account owner is checked before trusting these bytes (prefer Anchor Account<'info, T>)."
+    languages: [rust]
+    severity: WARNING
+    paths: { include: ["programs/**"] }
+
+  # Silent truncation (vuln #11).
+  - id: lossy-numeric-cast
+    pattern-either:
+      - pattern: $X as u8
+      - pattern: $X as u16
+      - pattern: $X as u32
+      - pattern: $X as u64
+    message: "`as` cast can silently truncate/wrap. Use try_from with an error on overflow in value paths."
     languages: [rust]
     severity: INFO
-    paths:
-      include:
-        - "programs/**"
+    paths: { include: ["programs/**"] }
+
+  # invoke without `?` — ignored CPI result (vuln #13).
+  - id: invoke-result-ignored
+    pattern-regex: '^\s*invoke(_signed)?\([^;]*\);'
+    message: "CPI return value not propagated with `?`; a failing CPI is silently ignored."
+    languages: [rust]
+    severity: WARNING
+    paths: { include: ["programs/**"] }
 
   - id: unwrap-in-program
     patterns:
       - pattern: $EXPR.unwrap()
-      - pattern-not-inside: |
-          #[cfg(test)]
-          ...
-    message: "unwrap() will panic; use ? or map_err() in program code"
+      - pattern-not-inside: "#[cfg(test)] ..."
+    message: "unwrap() will panic (DoS) on None/Err; use ? or map_err() in program code."
     languages: [rust]
     severity: WARNING
+    paths: { include: ["programs/**"] }
 ```
+
+> Triage every hit. The authority and raw-deserialize rules are intentionally noisy — their value is forcing you to *look at* each authority account and each manual deserialization, which is exactly where Critical findings hide.
 
 ---
 

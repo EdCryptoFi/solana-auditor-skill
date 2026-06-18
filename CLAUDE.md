@@ -35,7 +35,16 @@ Or ask naturally:
 |---------|-------------|
 | `/audit-init` | Start of every audit engagement |
 | `/audit-scan` | Phase 1 — automated analysis |
-| `/audit-report` | Phase 5 — generate final report |
+| `/audit-onchain` | Deployed program — verify bytecode, authority, blast radius |
+| `/audit-report` | Phase 5 — generate final report (markdown + SARIF + JSON) |
+
+## Specialized Skill Files
+
+Beyond the source-review core, load on demand:
+- **Deployed programs / verifiable builds** → `skill/onchain-analysis.md`
+- **Native / Pinocchio (non-Anchor)** → `skill/native-pinocchio-patterns.md`
+- **Upgrade / differential audits** → `skill/diff-audit.md`
+- **DeFi economic exploits** → `skill/defi-economic-exploits.md`
 
 ## Agents
 

@@ -278,6 +278,109 @@ For the final (post-remediation) version of the report:
 
 ---
 
+## Machine-Readable Output (SARIF / JSON)
+
+Always emit a structured findings file alongside the human report. CI pipelines, GitHub code scanning, and dashboards consume SARIF; protocol tooling often prefers a simpler JSON. Generate both from the same findings tracker so they never drift.
+
+### Why
+- **GitHub Code Scanning**: a `.sarif` uploaded via `github/codeql-action/upload-sarif` renders findings inline on the PR diff.
+- **Regression gating**: CI can fail a build if a finding of severity ≥ High reappears.
+- **Diff audits**: machine-readable findings make v1→v2 finding deltas computable (see diff-audit.md).
+
+### SARIF 2.1.0 template
+
+```json
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "solana-auditor",
+          "informationUri": "https://github.com/solanabr/solana-auditor-skill",
+          "version": "1.0.0",
+          "rules": [
+            {
+              "id": "SOL-001-missing-signer",
+              "name": "MissingSignerCheck",
+              "shortDescription": { "text": "Missing signer check" },
+              "helpUri": "https://github.com/solanabr/solana-auditor-skill/blob/main/skill/vulnerability-patterns.md",
+              "properties": { "security-severity": "9.1" }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "SOL-001-missing-signer",
+          "level": "error",
+          "message": { "text": "withdraw() transfers from the vault without checking authority.is_signer; any caller can drain funds." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "programs/vault/src/instructions/withdraw.rs" },
+                "region": { "startLine": 24, "endLine": 31 }
+              }
+            }
+          ],
+          "properties": {
+            "cvss": "9.1",
+            "cvssVector": "AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:H",
+            "severity": "Critical",
+            "status": "Open"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Severity mapping** (SARIF `level` ← audit severity): Critical/High → `error`, Medium → `warning`, Low/Informational → `note`. Always also set `properties.security-severity` (string CVSS, e.g. `"9.1"`) so GitHub buckets it correctly.
+
+### Simpler `findings.json` (protocol-friendly)
+
+```json
+{
+  "audit": { "protocol": "Example", "commit": "abc1234", "auditor": "solana-auditor", "date": "2026-06-18" },
+  "summary": { "critical": 1, "high": 0, "medium": 2, "low": 1, "informational": 3 },
+  "findings": [
+    {
+      "id": "FINDING-001",
+      "title": "Missing signer on withdraw",
+      "severity": "Critical",
+      "cvss": 9.1,
+      "cvssVector": "AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:H",
+      "category": "Account Validation",
+      "location": "programs/vault/src/instructions/withdraw.rs:24-31",
+      "status": "Open",
+      "hasPoc": true,
+      "recommendation": "Change `authority: AccountInfo` to `authority: Signer`."
+    }
+  ]
+}
+```
+
+### CI consumption
+
+```yaml
+# In .github/workflows/audit-ci.yml
+      - name: Upload audit findings to code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: audit-workspace/reports/findings.sarif
+
+      - name: Fail build on unresolved High+ findings
+        run: |
+          jq -e '[.findings[] | select(.status=="Open" and (.severity=="Critical" or .severity=="High"))] | length == 0' \
+            audit-workspace/reports/findings.json
+```
+
+> Keep `findings.json` as the source of truth in `audit-workspace/`. Generate the markdown report, the SARIF file, and the remediation table from it — one dataset, three views.
+
+---
+
 ## Quality Gate
 
 Before sending the report:
@@ -291,4 +394,5 @@ Before sending the report:
 [ ] Scope section accurately describes what was reviewed
 [ ] Limitations section is honest about what was NOT checked
 [ ] Report version matches remediation round (1.0 initial, 1.1 post-fix)
+[ ] Machine-readable findings.json + findings.sarif emitted from the same data
 ```

@@ -72,10 +72,10 @@ Use the official CVSS 3.1 calculator for scoring:
 
 ## CTF Practice (Skill Building)
 
-- [Neodyme Solana CTF](https://workshop.neodyme.io/) — 10 vulnerable programs to exploit
-- [OtterSec CTF Challenges](https://github.com/otter-sec/sol-ctf-framework)
-- [Kudelski Security Solana CTF](https://github.com/neodyme-labs/solana-ctf)
-- [Coral Sec CTF](https://github.com/coral-xyz/coral-sec-ctf)
+- [Neodyme Solana Security Workshop](https://workshop.neodyme.io/) — guided vulnerable programs to exploit
+- [Neodyme Solana CTF repo](https://github.com/neodyme-labs/solana-ctf) — the workshop's challenge programs
+- [OtterSec CTF framework](https://github.com/otter-sec/sol-ctf-framework) — harness for building/solving Solana CTF challenges
+- [Blueshift challenges](https://learn.blueshift.gg/en/challenges) — Anchor & Pinocchio security exercises
 
 ---
 
@@ -89,3 +89,20 @@ Use the official CVSS 3.1 calculator for scoring:
 | `kani` | Rust model checker | github.com/model-checking/kani |
 | `semgrep` | Pattern matching | github.com/semgrep/semgrep |
 | Trail of Bits lints | Solana-specific clippy lints | github.com/trailofbits/solana-lints |
+| `solana-verify` | Verifiable/reproducible builds | github.com/Ellipsis-Labs/solana-verifiable-build |
+| OtterSec registry | Public verified-build status | verify.osec.io |
+
+---
+
+## Verifiable Builds & On-Chain Verification
+
+- [Solana Verified Builds guide](https://solana.com/developers/guides/advanced/verified-builds)
+- [solana-verifiable-build (Ellipsis Labs)](https://github.com/Ellipsis-Labs/solana-verifiable-build)
+- [solana-verifiable-build (Solana Foundation)](https://github.com/solana-foundation/solana-verifiable-build)
+- See [onchain-analysis.md](onchain-analysis.md) for the full deployed-program workflow
+
+## Native & Pinocchio
+
+- [Pinocchio (anza-xyz)](https://github.com/anza-xyz/pinocchio)
+- [How to Build Solana Programs with Pinocchio (Helius)](https://www.helius.dev/blog/pinocchio)
+- See [native-pinocchio-patterns.md](native-pinocchio-patterns.md) for non-Anchor vuln patterns

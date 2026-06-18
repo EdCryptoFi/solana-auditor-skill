@@ -38,7 +38,7 @@ This skill is for **conducting** an audit of existing code, not for writing code
 
 ---
 
-## Three Audit Modes
+## Four Audit Modes
 
 Choose your mode before loading skill files:
 
@@ -47,6 +47,9 @@ Choose your mode before loading skill files:
 | **Firm** | Full professional engagement, production protocol | `lead-auditor` | Days–weeks |
 | **Competition** | Code4rena / Cantina / Sherlock contest | `competition-auditor` | Hours–days |
 | **Self-audit** | Builder reviewing their own code before launch | `vuln-researcher` | Hours |
+| **Differential / Upgrade** | Review only the diff between two versions of a live program | `lead-auditor` + [diff-audit.md](diff-audit.md) | Hours–days |
+
+For a **deployed** program (you have a Program ID, not just source), always start with [onchain-analysis.md](onchain-analysis.md) to confirm the bytecode matches the source before reviewing it.
 
 ---
 
@@ -73,8 +76,13 @@ Choose your mode before loading skill files:
 | "Formal verification", "prove invariants", "Kani", "property tests" | [formal-verification.md](formal-verification.md) |
 | "Write the report", "format findings", "CVSS score", "executive summary" | [report-generation.md](report-generation.md) |
 | "Set up tools", "Trident setup", "cargo audit", "CI for audits" | [tools-setup.md](tools-setup.md) |
+| "Audit this program ID", "is it verified", "deployed code", "verifiable build", "upgrade authority on-chain" | [onchain-analysis.md](onchain-analysis.md) |
+| "No Anchor", "native program", "Pinocchio", "process_instruction", "TryFrom accounts", "no_std" | [native-pinocchio-patterns.md](native-pinocchio-patterns.md) |
+| "Audit this upgrade", "review the diff", "v2 vs v1", "what changed", "differential audit" | [diff-audit.md](diff-audit.md) |
+| "Economic exploit", "flash loan", "oracle manipulation", "AMM/lending/staking", "rounding", "first depositor" | [defi-economic-exploits.md](defi-economic-exploits.md) |
 | "AI agent", "session keys", "LLM oracle", "agent wallet", "prompt injection" | [ai-agent-vulnerabilities.md](ai-agent-vulnerabilities.md) |
 | "I'm from Ethereum", "EVM comparison", "Slither equivalent", "SWC" | [evm-to-solana-mapping.md](evm-to-solana-mapping.md) |
+| "Machine-readable findings", "SARIF", "findings.json", "code scanning" | [report-generation.md](report-generation.md#machine-readable-output-sarif--json) |
 | "References", "prior audits", "known exploits" | [resources.md](resources.md) |
 
 Load **one file at a time**. Do not pre-load all files — context is precious.
@@ -100,7 +108,8 @@ Spawn specialized agents for long-running or parallel audit work:
 |---------|-------------|
 | `/audit-init` | Scaffold audit workspace, initialize findings tracker |
 | `/audit-scan` | Run all automated tools and collect raw findings |
-| `/audit-report` | Generate formatted audit report from findings |
+| `/audit-onchain` | Inspect a deployed Program ID: authority, verifiable build, blast radius |
+| `/audit-report` | Generate formatted audit report (markdown + SARIF + JSON) from findings |
 
 ---
 

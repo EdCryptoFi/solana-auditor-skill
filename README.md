@@ -17,8 +17,17 @@ This skill turns Claude Code into a senior Solana security auditor. It conducts 
 | **2 — Manual review** | 25-pattern systematic checklist per instruction |
 | **3 — Deep analysis** | Exploit PoC development, economic attack modeling |
 | **4 — Formal verification** | Kani proofs, Trident invariants, proptest |
-| **5 — Reporting** | CVSS-scored findings, publication-quality report |
+| **5 — Reporting** | CVSS-scored findings, publication-quality report + SARIF/JSON |
 | **6 — Remediation** | Fix verification, PoC regression, re-scoring |
+
+### Beyond a source review
+
+Real audits aren't always a clean source tree. This skill also covers:
+
+- **Deployed programs** — audit by Program ID: confirm the on-chain bytecode matches the source (`solana-verify`), classify the upgrade authority, and quantify blast radius before reviewing a line. ([onchain-analysis.md](skill/onchain-analysis.md))
+- **Native & Pinocchio** — non-Anchor programs where owner/signer/discriminator checks are all manual. ([native-pinocchio-patterns.md](skill/native-pinocchio-patterns.md))
+- **Upgrade / differential audits** — review only the diff between v1 and v2, with invariant-regression analysis and state-migration safety. ([diff-audit.md](skill/diff-audit.md))
+- **Economic exploits** — flash-loan/oracle manipulation, first-depositor inflation, rounding leaks, liquidation abuse. ([defi-economic-exploits.md](skill/defi-economic-exploits.md))
 
 ## How It Differs from Other Security Skills
 
@@ -48,7 +57,8 @@ The installer copies the skill to `~/.claude/skills/solana-auditor/` and updates
 ```
 /audit-init    — initialize workspace, survey codebase
 /audit-scan    — run all automated analysis tools
-/audit-report  — generate the final audit report
+/audit-onchain — inspect a deployed Program ID (authority, verifiable build, blast radius)
+/audit-report  — generate the final audit report (markdown + SARIF + JSON)
 ```
 
 ### Natural Language
@@ -81,17 +91,25 @@ solana-auditor-skill/
 │   ├── SKILL.md                    # Routing hub (load first)
 │   ├── audit-lifecycle.md          # 6-phase workflow
 │   ├── vulnerability-patterns.md   # 25-pattern checklist
+│   ├── onchain-analysis.md         # Deployed program + verifiable builds
+│   ├── native-pinocchio-patterns.md# Non-Anchor / Pinocchio vuln patterns
+│   ├── diff-audit.md               # Differential / upgrade audits
+│   ├── defi-economic-exploits.md   # Flash-loan / oracle / rounding modeling
 │   ├── formal-verification.md      # Kani, Trident, proptest
-│   ├── report-generation.md        # Report templates + CVSS
+│   ├── report-generation.md        # Report templates + CVSS + SARIF/JSON
 │   ├── tools-setup.md              # Tool installation + CI
+│   ├── ai-agent-vulnerabilities.md # Agent wallets, session keys, prompt injection
+│   ├── evm-to-solana-mapping.md    # For auditors coming from Ethereum
 │   └── resources.md                # Prior audits, references
 ├── agents/
 │   ├── lead-auditor.md             # Opus: orchestrates audit
+│   ├── competition-auditor.md      # Opus: speed-optimized contest audits
 │   ├── vuln-researcher.md          # Sonnet: deep vuln analysis + PoC
 │   └── report-writer.md            # Sonnet: professional reports
 ├── commands/
 │   ├── audit-init.md               # /audit-init
 │   ├── audit-scan.md               # /audit-scan
+│   ├── audit-onchain.md            # /audit-onchain
 │   └── audit-report.md             # /audit-report
 └── rules/
     └── audit-discipline.md         # 10 non-negotiable audit rules
